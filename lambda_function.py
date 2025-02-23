@@ -1,4 +1,4 @@
-import awswrangler as wr
+import awssdkpandas as ap
 import pandas as pd
 import urllib.parse
 import os
@@ -17,13 +17,13 @@ def lambda_handler(event, context):
     )
     try:
         # Creating DF from content
-        df_raw = wr.s3.read_json("s3://{}/{}".format(bucket, key))
+        df_raw = ap.s3.read_json("s3://{}/{}".format(bucket, key))
 
         # Extract required columns:
         df_step_1 = pd.json_normalize(df_raw["items"])
 
         # Write to S3
-        wr_response = wr.s3.to_parquet(
+        wr_response = ap.s3.to_parquet(
             df=df_step_1,
             path=os_input_s3_cleansed_layer,
             dataset=True,
@@ -36,7 +36,7 @@ def lambda_handler(event, context):
     except Exception as e:
         print(e)
         print(
-            "Error getting object {} from bucket {}. Make sure they exist and your bucket is in the same region as this function.".format(
+            "Error getting object {} from bucket {}.".format(
                 key, bucket
             )
         )
